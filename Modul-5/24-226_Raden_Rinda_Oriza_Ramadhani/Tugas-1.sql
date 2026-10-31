@@ -1,0 +1,66 @@
+CREATE DATABASE IF NOT EXISTS db_penjualan;
+USE db_penjualan;
+CREATE TABLE supplier (
+supplier_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+nama VARCHAR(100) NOT NULL,
+telp VARCHAR(12) NOT NULL,
+alamat TEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE barang (
+barang_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+kode_barang VARCHAR(10) NOT NULL,
+nama_barang VARCHAR(100) NOT NULL,
+harga INT(11) NOT NULL,
+stok INT(11) NOT NULL,
+supplier_id INT(11) NOT NULL,
+CONSTRAINT fk_barang_supplier FOREIGN KEY (supplier_id) REFERENCES
+supplier(supplier_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE pelanggan (
+pelanggan_id VARCHAR(20) NOT NULL PRIMARY KEY,
+nama VARCHAR(100) NOT NULL,
+jenis_kelamin ENUM('L', 'P') NOT NULL,
+telp VARCHAR(12) NOT NULL,
+alamat TEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE user (
+id_user INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+username VARCHAR(30) NOT NULL,
+password VARCHAR(35) NOT NULL,
+nama VARCHAR(50) NOT NULL,
+alamat VARCHAR(150) NOT NULL,
+hp VARCHAR(20) NOT NULL,
+level TINYINT(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE transaksi (
+transaksi_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+waktu_transaksi DATE NOT NULL,
+keterangan TEXT NOT NULL,
+total INT(11) NOT NULL,
+pelanggan_id VARCHAR(20) NOT NULL,
+id_user INT(11) NOT NULL,
+CONSTRAINT fk_transaksi_pelanggan FOREIGN KEY (pelanggan_id)
+REFERENCES pelanggan(pelanggan_id) ON DELETE CASCADE ON UPDATE CASCADE,
+CONSTRAINT fk_transaksi_user FOREIGN KEY (id_user) REFERENCES
+user(id_user) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE transaksi_detail (
+transaksi_id INT(11) NOT NULL,
+barang_id INT(11) NOT NULL,
+harga INT(11) NOT NULL,
+qty INT(11) NOT NULL,
+PRIMARY KEY (transaksi_id, barang_id),
+CONSTRAINT fk_detail_transaksi FOREIGN KEY (transaksi_id) REFERENCES
+transaksi(transaksi_id) ON DELETE CASCADE ON UPDATE CASCADE,
+CONSTRAINT fk_detail_barang FOREIGN KEY (barang_id) REFERENCES
+barang(barang_id) ON DELETE CASCADE ON UPDATE CASCADE
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE pembayaran (
+pembayaran_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+waktu_bayar DATETIME NOT NULL,
+metode ENUM('TUNAI', 'TRANSFER', 'EDC') NOT NULL,
+transaksi_id INT(11) NOT NULL,
+CONSTRAINT fk_pembayaran_transaksi FOREIGN KEY (transaksi_id)
+REFERENCES transaksi(transaksi_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
