@@ -1,34 +1,27 @@
 <?php
 include 'koneksi.php';
-
-// id transaksi dikirim lewat link: detail.php?id=...
 $id = (int)$_GET['id'];
 
-// ---------- proses simpan detail ketika tombol Simpan ditekan ----------
 if (isset($_POST['simpan'])) {
     $barang_id = (int)$_POST['barang_id'];
     $qty       = (int)$_POST['qty'];
 
-    // cek dulu: apakah barang ini sudah ada di transaksi yang sama?
     $cek = mysqli_query($koneksi, "SELECT COUNT(*) AS jumlah FROM transaksi_detail WHERE transaksi_id = $id AND barang_id = $barang_id");
     $hasil = mysqli_fetch_assoc($cek);
 
     if ($hasil['jumlah'] > 0) {
         echo "<script>alert('Barang sudah ada di transaksi ini!');</script>";
     } else {
-        // harga diambil dari tabel barang
         $brg = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT harga FROM barang WHERE id = $barang_id"));
         $harga = $brg['harga'];
 
         mysqli_query($koneksi, "INSERT INTO transaksi_detail (transaksi_id, barang_id, harga, qty) VALUES ($id, $barang_id, $harga, $qty)");
 
-        // muat ulang halaman supaya data baru tampil
         header("Location: detail.php?id=$id");
         exit;
     }
 }
 
-// ---------- data MASTER: transaksi yang dipilih ----------
 $master = mysqli_fetch_assoc(mysqli_query($koneksi, "
     SELECT transaksi.*, pelanggan.nama AS nama_pelanggan
     FROM transaksi
@@ -40,7 +33,6 @@ if (!$master) {
     die("Transaksi tidak ditemukan.");
 }
 
-// ---------- data DETAIL: barang pada transaksi ini ----------
 $detail = mysqli_query($koneksi, "
     SELECT barang.nama_barang, transaksi_detail.harga, transaksi_detail.qty
     FROM transaksi_detail
@@ -48,7 +40,6 @@ $detail = mysqli_query($koneksi, "
     WHERE transaksi_detail.transaksi_id = $id
 ");
 
-// ---------- isi dropdown: hanya barang yang BELUM ada di transaksi ini ----------
 $pilihan = mysqli_query($koneksi, "
     SELECT id, nama_barang, harga
     FROM barang
