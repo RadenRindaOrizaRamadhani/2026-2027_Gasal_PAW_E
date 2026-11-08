@@ -8,7 +8,6 @@ if (isset($_GET['hapus'])) {
     $hasil = mysqli_fetch_assoc($cek);
 
     if ($hasil['jumlah'] > 0) {
-        // sudah dipakai -> tidak boleh dihapus
         echo "<script>
                 alert('Barang tidak dapat dihapus karena masih digunakan pada transaksi!');
                 window.location = 'Tugas-3.php';
